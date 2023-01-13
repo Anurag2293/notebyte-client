@@ -43,8 +43,9 @@ const NoteState = (props) => {
         });
         const json = await response.json();
 
-        // concat returns an array whereas push updates an array
+        // // concat returns an array whereas push updates an array
         setNotes(notes.concat(json));
+        // getNotes();
     }
 
     /**
@@ -62,9 +63,8 @@ const NoteState = (props) => {
                 }
             });
 
-            await getNotes()
-            // const newNotes = notes.filter((note) => { return note._id !== id });
-            // setNotes(newNotes);
+            const newNotes = notes.filter((note) => { return note._id !== id });
+            setNotes(newNotes);
         } catch (e) {
             alert(e.message);
         }
@@ -87,17 +87,18 @@ const NoteState = (props) => {
             },
             body: JSON.stringify({ title, description, tag })
         });
-        // const json = await response.json();
+        await response.json();
 
-        // Login to edit in client
+        let newNotes = JSON.parse(JSON.stringify(notes));
         for (let index = 0; index < notes.length; index++) {
-            const element = notes[index];
-            if (element._id === id) {
-                element.title = title;
-                element.description = description;
-                element.tag = tag;
+            if (newNotes[index]._id === id) {
+                newNotes[index].title = title;
+                newNotes[index].description = description;
+                newNotes[index].tag = tag;
             }
         }
+        setNotes(newNotes);
+        // getNotes();
     }
 
     return (
