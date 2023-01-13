@@ -1,3 +1,4 @@
+import React, {useState} from 'react';
 import { Routes, Route } from 'react-router-dom';
 
 import './App.css';
@@ -10,18 +11,31 @@ import Signup from './components/Signup';
 import NoteState from './context/notes/NoteState';
 
 function App() {
+  const [alert, setAlert] = useState(null);
+
+  const showAlert = (message, type) => {
+    setAlert({
+      msg: message,
+      type: type
+    });
+
+    setTimeout(() => {
+      setAlert(null);
+    }, 1000);
+  }
+
   return (
     <>
       <NoteState>
         <Navbar />
-        <Alert message="This is an Alert"/>
+        <Alert alert={alert}/>
 
         <div className="container">
           <Routes>
-            <Route exact path='/' element={<Home />} />
+            <Route exact path='/' element={<Home showAlert={showAlert} />} />
             <Route exact path='/about' element={<About />} />
-            <Route exact path='/login' element={<Login/>} />
-            <Route exact path='/signup' element={<Signup/>} />
+            <Route exact path='/login' element={<Login showAlert={showAlert}/>} />
+            <Route exact path='/signup' element={<Signup showAlert={showAlert}/>} />
           </Routes>
         </div>
       </NoteState>
