@@ -20,8 +20,9 @@ const NoteState = (props) => {
                 'auth-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjNiYzU3NjFkZWJmYjdlOGFlYWZiNzNmIn0sImlhdCI6MTY3MzM0MzE2OX0.WCbd_l0pWuvW9SkyO20Yc2NgBLo8QAxmQgTsZryUsJA'
             }
         });
-        const json = await response.json();
-        setNotes(json);
+        const noteObject = await response.json(); 
+        // Note that despite the method being named json(), the result is not JSON but is instead the result of taking JSON as input and parsing it to produce a JavaScript object.
+        setNotes(noteObject);
     }
 
     /**
@@ -31,21 +32,24 @@ const NoteState = (props) => {
      * @param {String} tag 
      */
     const addNote = async (title, description, tag) => {
-        // API Call
-        const response = await fetch(`${host}/api/notes/addnote`, {
-            method: 'POST',
-            headers: {
-                'mode': 'no-cors',
-                'Content-Type': 'application/json',
-                'auth-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjNiYzU3NjFkZWJmYjdlOGFlYWZiNzNmIn0sImlhdCI6MTY3MzM0MzE2OX0.WCbd_l0pWuvW9SkyO20Yc2NgBLo8QAxmQgTsZryUsJA'
-            },
-            body: JSON.stringify({ title, description, tag })
-        });
-        const json = await response.json();
+        try {
+            // API Call
+            const response = await fetch(`${host}/api/notes/addnote`, {
+                method: 'POST',
+                headers: {
+                    'mode': 'no-cors',
+                    'Content-Type': 'application/json',
+                    'auth-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjNiYzU3NjFkZWJmYjdlOGFlYWZiNzNmIn0sImlhdCI6MTY3MzM0MzE2OX0.WCbd_l0pWuvW9SkyO20Yc2NgBLo8QAxmQgTsZryUsJA'
+                },
+                body: JSON.stringify({ title, description, tag })
+            });
+            const noteObject = await response.json();
 
-        // // concat returns an array whereas push updates an array
-        setNotes(notes.concat(json));
-        // getNotes();
+            // concat returns an array whereas push updates an array
+            setNotes(notes.concat(noteObject)); // [OR] getNotes();
+        } catch (error) {
+            alert(error.message)
+        }
     }
 
     /**
@@ -63,6 +67,7 @@ const NoteState = (props) => {
                 }
             });
 
+            // getNotes() [OR]
             const newNotes = notes.filter((note) => { return note._id !== id });
             setNotes(newNotes);
         } catch (e) {
@@ -88,17 +93,14 @@ const NoteState = (props) => {
             body: JSON.stringify({ title, description, tag })
         });
         await response.json();
-
-        let newNotes = JSON.parse(JSON.stringify(notes));
-        for (let index = 0; index < notes.length; index++) {
-            if (newNotes[index]._id === id) {
-                newNotes[index].title = title;
-                newNotes[index].description = description;
-                newNotes[index].tag = tag;
+        
+        const newNotes = notes.map(note => {
+            if (note._id === id) {
+                return {...note , title , description , tag} ;
             }
-        }
+            return note;
+        });
         setNotes(newNotes);
-        // getNotes();
     }
 
     return (
